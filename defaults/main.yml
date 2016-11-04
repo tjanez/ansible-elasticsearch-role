@@ -1,0 +1,15 @@
+---
+elasticsearch_version: "5.0"
+
+elasticsearch_sysctl_file: /etc/sysctl.d/00-elasticsearch.conf
+
+elasticsearch_heap_size_mem_frac: 0.5
+elasticsearch_cluster_name: elasticsearch
+elasticsearch_node_name: "{{ ansible_nodename }}"
+elasticsearch_network_host: localhost
+elasticsearch_http_port: 9200
+elasticsearch_discovery_zen_hosts:
+  - "127.0.0.1"
+  - "[::1]"
+elasticsearch_only_one_node_per_system: true
+elasticsearch_logging_to_file: false

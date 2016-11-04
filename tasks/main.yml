@@ -1,0 +1,20 @@
+---
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+- name: Sanity check of role's configuration
+  assert:
+    that:
+      - elasticsearch_version in ["2.4", "5.0"]
+
+- include: install.yml
+
+- include: configure.yml
+
+# run pending handlers before validating Elasticsearch installation
+- meta: flush_handlers
+
+- include: validate.yml

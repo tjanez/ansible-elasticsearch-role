@@ -1,0 +1,120 @@
+---
+- name: Enable logging to systemd journal
+  lineinfile:
+    dest: /usr/lib/systemd/system/elasticsearch.service
+    regexp: '\s*--quiet\s*\\'
+    state: absent
+  notify:
+    - Restart Elasticsearch
+
+- name: Set maximum number of processes/threads that can be spawned by Elasticsearch service
+  blockinfile:
+    dest: /usr/lib/systemd/system/elasticsearch.service
+    block: |
+      # Specifies the maximum number of processes/threads that can be spawned by this process
+      LimitNPROC=2048
+    insertafter: "^LimitNOFILE.*"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK (LimitNPROC)"
+  notify:
+    - Restart Elasticsearch
+
+- name: Check if tuned service is enabled
+  command: systemctl --quiet is-enabled tuned.service
+  register: elasticsearch_tuned_service_res
+  changed_when: false
+  failed_when: false
+
+- set_fact:
+    elasticsearch_tuned_service_enabled: "{{ elasticsearch_tuned_service_res.rc == 0 }}"
+
+- include: configure-tuned.yml
+  when: elasticsearch_tuned_service_enabled
+
+# NOTE: Elasticsearch recommends disabling swapping altogether for
+# performance reasons. We opt for an approach that prevents swapping under
+# normal circumstances, but still allows the OS to swap under emergency
+# memory situations.
+# For more details see:
+# https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html
+- name: Limit swapping to emergency memory situations
+  sysctl:
+    name: vm.swappiness
+    value: 1
+    sysctl_file: "{{ elasticsearch_sysctl_file }}"
+    reload: no
+  when: not elasticsearch_tuned_service_enabled
+
+# NOTE: Currently, it is not possible to use the sysctl module for just
+# reloading sysctl
+# (https://github.com/ansible/ansible-modules-core/issues/3645)
+# NOTE: While using the sysctl command line utility, it is not easy to detect
+# if the applied sysctl settings changed or not, so this task always reports
+# as "changed".
+- name: Ensure Elasticsearch's sysctl settings are applied
+  command: sysctl --system
+
+# NOTE: The minimal and maximal heap size is 256 MB and 31 GB (respectively)
+# For more details see:
+# https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html
+- name: Set Heap size according to the desired fraction of total memory
+  set_fact:
+    elasticsearch_heap_size_mb: "{{ [[(ansible_memtotal_mb * elasticsearch_heap_size_mem_frac) | int, 256] | max, 31000] | min }}"
+
+- name: Configure Elasticsearch
+  template:
+    src: etc/elasticsearch/elasticsearch.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+  notify:
+    - Restart Elasticsearch
+
+- name: Configure Elasticsearch system settings
+  template:
+    src: etc/sysconfig/elasticsearch.j2
+    dest: /etc/sysconfig/elasticsearch
+  notify:
+    - Restart Elasticsearch
+
+- block:
+  - name: Configure Elasticsearch JVM options
+    template:
+      src: etc/elasticsearch/jvm.options.j2
+      dest: /etc/elasticsearch/jvm.options
+    notify:
+      - Restart Elasticsearch
+
+  - name: Configure Elasticsearch logging
+    template:
+      src: etc/elasticsearch/log4j2.properties.j2
+      dest: /etc/elasticsearch/log4j2.properties
+    notify:
+      - Restart Elasticsearch
+
+  - name: Remove other Elasticsearch logging configuration
+    file:
+      path: /etc/elasticsearch/logging.yml
+      state: absent
+
+  when: elasticsearch_version == "5.0"
+
+- block:
+  - name: Remove Elasticsearch JVM options file
+    file:
+      path: /etc/elasticsearch/jvm.options
+      state: absent
+
+  - name: Configure Elasticsearch logging
+    template:
+      src: etc/elasticsearch/logging.yml.j2
+      dest: /etc/elasticsearch/logging.yml
+    notify:
+      - Restart Elasticsearch
+
+  - name: Remove other Elasticsearch logging configuration
+    file:
+      path: /etc/elasticsearch/log4j2.properties
+      state: absent
+
+  when: elasticsearch_version == "2.4"
+
+- name: Enable and start Elasticsearch
+  systemd: name=elasticsearch enabled=yes state=started

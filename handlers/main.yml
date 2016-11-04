@@ -1,0 +1,8 @@
+---
+# NOTE: Setting daemon_reload to 'yes' ensures systemd has read any unit file
+# changes before restarting Elasticsearch service
+- name: Restart Elasticsearch
+  systemd: name=elasticsearch state=restarted daemon_reload=yes
+
+- name: Restart tuned
+  systemd: name=tuned state=restarted

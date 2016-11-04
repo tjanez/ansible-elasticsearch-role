@@ -1,0 +1,73 @@
+---
+- name: Wait for Elasticsearch service to become available
+  wait_for:
+    host: "{{ elasticsearch_network_host }}"
+    port: "{{ elasticsearch_http_port }}"
+    timeout: 30
+
+- name: Get node's process statistics
+  uri:
+    url: http://{{ elasticsearch_network_host }}:{{ elasticsearch_http_port }}
+      /_nodes/{{ elasticsearch_node_name }}/stats/process
+  register: elasticsearch_process_res
+
+- name: Ensure maximum number of open file descriptors is high enough
+  fail:
+    msg: >
+      Elasticsearch process' maximum number of open file descriptors is not set
+      high enough (i.e. to more than 64000). For more info, see:
+      https://www.elastic.co/guide/en/elasticsearch/guide/current/_file_descriptors_and_mmap.html
+  when: elasticsearch_process_res.json.nodes.values().0.process.max_file_descriptors | int < 64000
+
+- name: Get value of maximum number of memory map areas for a process
+  command: sysctl --values vm.max_map_count
+  register: elasticsearch_mmap_res
+  changed_when: false
+
+- name: Ensure maximum number of memory map areas for a process is high enough
+  fail:
+    msg: >
+      System's setting for maximum number of memory map areas for a process is
+      not set high enough (i.e. at least 262144). For more info, see:
+      https://www.elastic.co/guide/en/elasticsearch/reference/5.0/vm-max-map-count.html
+  when: elasticsearch_mmap_res.stdout | int < 262144
+
+- name: Get swappiness value
+  command: sysctl --values vm.swappiness
+  register: elasticsearch_swap_res
+  changed_when: false
+
+- name: Ensure swapping is limited to emergency memory situations
+  fail:
+    msg: >
+      System's setting for swappiness is not set correctly.
+      For more info, see:
+      https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html
+  when: elasticsearch_swap_res.stdout | int != 1
+
+- name: Get maximum number of processes/threads that can be spawned by Elasticsearch service
+  command: systemctl --property=LimitNPROC show elasticsearch.service
+  register: elasticsearch_nproc_res
+  changed_when: false
+
+- name: Ensure maximum number of processes/threads that can be spawned is high enough
+  fail:
+    msg: >
+      Elasticsearch service can't spawn enough processes/threads (i.e. at least
+      2048). For info, see:
+      https://www.elastic.co/guide/en/elasticsearch/reference/5.0/max-number-of-threads.html
+  when: elasticsearch_nproc_res.stdout | regex_replace('^LimitNPROC=', '') | int < 2048
+
+- name: Get node's JVM information
+  uri:
+    url: http://{{ elasticsearch_network_host }}:{{ elasticsearch_http_port }}
+      /_nodes/{{ elasticsearch_node_name }}/jvm
+  register: elasticsearch_jvm_res
+
+- name: Ensure compressed ordinary object pointers are used
+  fail:
+    msg: >
+      Elasticsearch is not using compressed ordinary object pointers. Heap size
+      is too large! For more info, see:
+      https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html
+  when: elasticsearch_jvm_res.json.nodes.values().0.jvm.using_compressed_ordinary_object_pointers | bool == False

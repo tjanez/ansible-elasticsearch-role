@@ -1,0 +1,46 @@
+---
+- name: Get active tuned profile
+  command: tuned-adm active
+  register: elasticsearch_tuned_profile_res
+  changed_when: false
+
+- set_fact:
+    elasticsearch_tuned_profile: "{{ elasticsearch_tuned_profile_res.stdout | replace('Current active profile: ', '') }}"
+
+# NOTE: It is not possible to reference previously set facts within the same
+#       invocation of the set_fact module
+- set_fact:
+    elasticsearch_tuned_profile_distribution_conf: /usr/lib/tuned/{{ elasticsearch_tuned_profile }}/tuned.conf
+    elasticsearch_tuned_profile_custom_conf: /etc/tuned/{{ elasticsearch_tuned_profile }}/tuned.conf
+
+- name: Check if custom configuration for profile exists
+  stat: path={{ elasticsearch_tuned_profile_custom_conf }}
+  register: elasticsearch_tuned_profile_custom_conf_res
+
+- block:
+  - name: Create directory for custom configuration of active tuned profile
+    file:
+      path: "{{ elasticsearch_tuned_profile_custom_conf | dirname }}"
+      state: directory
+
+  - name: Create empty custom configuration of active tuned profile
+    template:
+      src: etc/tuned/custom.conf.j2
+      dest: "{{ elasticsearch_tuned_profile_custom_conf }}"
+
+  when: not elasticsearch_tuned_profile_custom_conf_res.stat.exists
+
+# NOTE: Elasticsearch recommends disabling swapping altogether for performance
+# reasons. We opt for an approach that prevents swapping under normal
+# circumstances, but still allows the OS to swap under emergency memory
+# situations
+# For more details see:
+# https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html
+- name: Configure active tuned profile to limit swapping to emergency memory situations
+  ini_file:
+    dest: "{{ elasticsearch_tuned_profile_custom_conf }}"
+    section: sysctl
+    option: vm.swappiness
+    value: 1
+  notify:
+    - Restart tuned

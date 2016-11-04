@@ -1,0 +1,56 @@
+---
+- name: Install JVM
+  package: name={{ elasticsearch_java_package }} state=present
+
+- block:
+  - name: Add repository for Elasticsearch 2.x packages
+    yum_repository:
+      name: elasticsearch-2.x
+      description: Upstream Elasticsearch repository for 2.x packages
+      baseurl: https://packages.elastic.co/elasticsearch/2.x/centos
+      skip_if_unavailable: no
+      gpgcheck: yes
+      gpgkey: https://packages.elastic.co/GPG-KEY-elasticsearch
+      enabled: yes
+
+  - name: Remove repository for Elasticsearch 5.x packages
+    yum_repository:
+      name: elasticsearch-5.x
+      state: absent
+
+  when: elasticsearch_version == "2.4"
+
+- block:
+  - name: Add repository for Elasticsearch 5.x packages
+    yum_repository:
+      name: elasticsearch-5.x
+      description: Upstream Elasticsearch repository for 5.x packages
+      baseurl: https://artifacts.elastic.co/packages/5.x/yum
+      skip_if_unavailable: no
+      gpgcheck: yes
+      gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+      enabled: yes
+
+  - name: Remove repository for Elasticsearch 2.x packages
+    yum_repository:
+      name: elasticsearch-2.x
+      state: absent
+
+  when: elasticsearch_version == "5.0"
+
+- name: Check version of installed Elasticsearch
+  command: rpm -q --queryformat "%{VERSION}" elasticsearch
+  register: elasticsearch_version_res
+  changed_when: false
+  failed_when: false
+
+- name: Remove other version of Elasticsearch
+  package: name=elasticsearch state=absent
+  when:
+    - not elasticsearch_version_res.stdout | match('package elasticsearch is not installed')
+    - not elasticsearch_version_res.stdout | search('^' + elasticsearch_version)
+
+- name: Install Elasticsearch
+  package: name=elasticsearch state=present
+  notify:
+    - Restart Elasticsearch

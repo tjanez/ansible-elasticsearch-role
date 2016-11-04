@@ -1,0 +1,89 @@
+# {{ ansible_managed }}
+#
+# NOTE: Some variables must be configured in systemd's unit file:
+#       /usr/lib/systemd/system/elasticsearch.service
+#
+#       Namely:
+#         - User
+#         - Group
+#         - LimitNOFILE: maximum number of file descriptors that can be opened
+#
+# NOTE: When using systemd, the maximum number of VMA (Virtual Memory Areas) a
+# process can own must be set via 'vm.max_map_count' sysctl setting in
+# /usr/lib/sysctl.d/elasticsearch.conf
+
+################################
+# Elasticsearch
+################################
+
+# Elasticsearch home directory
+#ES_HOME=/usr/share/elasticsearch
+
+{% if elasticsearch_version == "5.0" %}
+# Elasticsearch Java path
+#JAVA_HOME=
+{% endif %}
+
+# Elasticsearch configuration directory
+#CONF_DIR=/etc/elasticsearch
+
+# Elasticsearch data directory
+{% if elasticsearch_data_dir is defined %}
+DATA_DIR={{ elasticsearch_data_dir }}
+{% else %}
+#DATA_DIR=/var/lib/elasticsearch
+{% endif %}
+
+# Elasticsearch logs directory
+{% if elasticsearch_log_dir is defined %}
+LOG_DIR={{ elasticsearch_log_dir }}
+{% else %}
+#LOG_DIR=/var/log/elasticsearch
+{% endif %}
+
+# Elasticsearch PID directory
+#PID_DIR=/var/run/elasticsearch
+
+{% if elasticsearch_version == "2.4" %}
+# Heap size defaults to 256m min, 1g max
+# Set ES_HEAP_SIZE to 50% of available RAM, but no more than 31g
+ES_HEAP_SIZE={{ elasticsearch_heap_size_mb }}m
+
+# Heap new generation
+#ES_HEAP_NEWSIZE=
+
+# Maximum direct memory
+#ES_DIRECT_SIZE=
+{% endif %}
+
+# Additional Java OPTS
+#ES_JAVA_OPTS=
+
+# Configure restart on package upgrade (true, every other setting will lead to not restarting)
+#RESTART_ON_UPGRADE=true
+
+{% if elasticsearch_version == "2.4" %}
+# Path to the GC log file
+#ES_GC_LOG_FILE=/var/log/elasticsearch/gc.log
+{% endif %}
+
+################################
+# Elasticsearch service
+################################
+
+# The number of seconds to wait before checking if Elasticsearch started successfully as a daemon process
+ES_STARTUP_SLEEP_TIME=5
+
+################################
+# System properties
+################################
+
+# The maximum number of bytes of memory that may be locked into RAM
+# Set to "unlimited" if you use the 'bootstrap.memory_lock: true' option
+# in elasticsearch.yml
+{% if elasticsearch_version == "2.4" %}
+# (ES_HEAP_SIZE  must also be set).
+{% endif %}
+# When using Systemd, the LimitMEMLOCK property must be set
+# in /usr/lib/systemd/system/elasticsearch.service
+#MAX_LOCKED_MEMORY=unlimited
