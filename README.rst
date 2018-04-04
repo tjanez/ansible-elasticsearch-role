@@ -1,5 +1,11 @@
-Elasticsearch role
-==================
+Elasticsearch
+=============
+
+|galaxy|
+
+.. |galaxy| image:: https://img.shields.io/ansible/role/24785.svg
+    :target: https://galaxy.ansible.com/tjanez/elasticsearch/
+    :alt: Ansible Role
 
 Ansible role to install and configure Elasticsearch 2.4 or 5.0 on RHEL/CentOS
 7.
