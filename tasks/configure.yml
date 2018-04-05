@@ -7,17 +7,6 @@
   notify:
     - Restart Elasticsearch
 
-- name: Set maximum number of processes/threads that can be spawned by Elasticsearch service
-  blockinfile:
-    dest: /usr/lib/systemd/system/elasticsearch.service
-    block: |
-      # Specifies the maximum number of processes/threads that can be spawned by this process
-      LimitNPROC=2048
-    insertafter: "^LimitNOFILE.*"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK (LimitNPROC)"
-  notify:
-    - Restart Elasticsearch
-
 - name: Check if tuned service is enabled
   command: systemctl --quiet is-enabled tuned.service
   register: elasticsearch_tuned_service_res
