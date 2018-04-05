@@ -1,8 +1,15 @@
 ---
-# NOTE: Setting daemon_reload to 'yes' ensures systemd has read any unit file
-# changes before restarting Elasticsearch service
+# NOTE: Ansible runs handlers in the order they are listed in this file and not
+# in the order they are notified.
+
+- name: Reload systemd configuration
+  systemd:
+    daemon_reload: yes
+
 - name: Restart Elasticsearch
-  systemd: name=elasticsearch state=restarted daemon_reload=yes
+  systemd:
+    name: elasticsearch
+    state: restarted
 
 - name: Restart tuned
   systemd: name=tuned state=restarted

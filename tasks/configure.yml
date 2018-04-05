@@ -1,10 +1,15 @@
 ---
+- name: Create directory for extending systemd unit's configuration
+  file:
+    path: /etc/systemd/system/elasticsearch.service.d/
+    state: directory
+
 - name: Enable logging to systemd journal
-  lineinfile:
-    dest: /usr/lib/systemd/system/elasticsearch.service
-    regexp: '\s*--quiet\s*\\'
-    state: absent
+  template:
+    src: etc/systemd/system/elasticsearch.service.d/enable_journald.conf.j2
+    dest: /etc/systemd/system/elasticsearch.service.d/enable_journald.conf
   notify:
+    - Reload systemd configuration
     - Restart Elasticsearch
 
 - name: Check if tuned service is enabled
@@ -85,5 +90,7 @@
 
   when: elasticsearch_version == "5"
 
-- name: Enable and start Elasticsearch
-  systemd: name=elasticsearch enabled=yes state=started
+- name: Enable Elasticsearch service
+  systemd:
+    name: elasticsearch
+    enabled: yes

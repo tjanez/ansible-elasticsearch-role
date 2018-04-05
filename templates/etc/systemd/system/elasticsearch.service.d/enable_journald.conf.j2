@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+
+# Remove --quiet option from the default ExecStart command to enable logging to
+# systemd journal.
+
+[Service]
+# NOTE: systemd disallows starting a service with more than one ExecStart
+# setting, hence making it impossible to over-ride the default ExecStart
+# command. More information here:
+# https://bugzilla.redhat.com/show_bug.cgi?id=1121783.
+# However, there is a well known work-around which is to first set ExecStart
+# command to an empty value and then set it to the correct value. More
+# information here:
+# https://github.com/moby/moby/issues/14491#issuecomment-119873335
+ExecStart=
+ExecStart=/usr/share/elasticsearch/bin/elasticsearch \
+    -p ${PID_DIR}/elasticsearch.pid \
+    -Edefault.path.logs=${LOG_DIR} \
+    -Edefault.path.data=${DATA_DIR} \
+    -Edefault.path.conf=${CONF_DIR}
