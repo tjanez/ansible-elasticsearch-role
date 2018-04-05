@@ -35,17 +35,7 @@
     name: vm.swappiness
     value: 1
     sysctl_file: "{{ elasticsearch_sysctl_file }}"
-    reload: no
   when: not elasticsearch_tuned_service_enabled
-
-# NOTE: Currently, it is not possible to use the sysctl module for just
-# reloading sysctl
-# (https://github.com/ansible/ansible-modules-core/issues/3645)
-# NOTE: While using the sysctl command line utility, it is not easy to detect
-# if the applied sysctl settings changed or not, so this task always reports
-# as "changed".
-- name: Ensure Elasticsearch's sysctl settings are applied
-  command: sysctl --system
 
 # NOTE: The minimal and maximal heap size is 256 MB and 31 GB (respectively)
 # For more details see:
