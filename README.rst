@@ -7,12 +7,15 @@ Elasticsearch
     :target: https://galaxy.ansible.com/tjanez/elasticsearch/
     :alt: Ansible Role
 
-Ansible role to install and configure Elasticsearch 2.4 or 5.0 on RHEL/CentOS
-7.
+Ansible role to install and configure Elasticsearch 5.x on RHEL/CentOS 7.
+
+**NOTE: This version of the role only supports Elasticsearch 5.x. To use the
+role with Elasticsearch 2.4, use version 1.0.0.**
 
 Main features:
 
 - Installs Elasticsearch from upstream's RPM repositories.
+- Upgrades Elastcisearch from version 2.x (if necessary).
 - Configures Elasticsearch according to the `official Elasticsearch Reference
   for version 5.0`_
 - Configures system's performance settings with `Tuned`_ if it is enabled
@@ -62,15 +65,14 @@ Variables in ``defaults/main.yml``:
 +--------------------------------------------+---------+-------------------------------------------+-----------------------------------------+
 |                Name                        |  Type   |                Description                |           Default                       |
 +============================================+=========+===========================================+=========================================+
-| ``elasticsearch_version``                  | string  | Major version to install.                 | ``"5.0"``                               |
+| ``elasticsearch_version``                  | string  | Major version to install.                 | ``"5"``                                 |
 |                                            |         | The actual version that is installed is   |                                         |
-|                                            |         | the latest minor version of the chosen    |                                         |
-|                                            |         | major version.                            |                                         |
+|                                            |         | the latest minor (and patch) version of   |                                         |
+|                                            |         | the chosen major version.                 |                                         |
 |                                            |         |                                           |                                         |
 |                                            |         | It can be one of the following:           |                                         |
 |                                            |         |                                           |                                         |
-|                                            |         | * ``"2.4"``                               |                                         |
-|                                            |         | * ``"5.0"``                               |                                         |
+|                                            |         | * ``"5"``                                 |                                         |
 +--------------------------------------------+---------+-------------------------------------------+-----------------------------------------+
 | ``elasticsearch_sysctl_file``              | string  | Path of Elasticsearch's sysctl            | ``/etc/sysctl.d/00-elasticsearch.conf`` |
 |                                            |         | configuration file.                       |                                         |

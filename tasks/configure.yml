@@ -94,27 +94,7 @@
       path: /etc/elasticsearch/logging.yml
       state: absent
 
-  when: elasticsearch_version == "5.0"
-
-- block:
-  - name: Remove Elasticsearch JVM options file
-    file:
-      path: /etc/elasticsearch/jvm.options
-      state: absent
-
-  - name: Configure Elasticsearch logging
-    template:
-      src: etc/elasticsearch/logging.yml.j2
-      dest: /etc/elasticsearch/logging.yml
-    notify:
-      - Restart Elasticsearch
-
-  - name: Remove other Elasticsearch logging configuration
-    file:
-      path: /etc/elasticsearch/log4j2.properties
-      state: absent
-
-  when: elasticsearch_version == "2.4"
+  when: elasticsearch_version == "5"
 
 - name: Enable and start Elasticsearch
   systemd: name=elasticsearch enabled=yes state=started

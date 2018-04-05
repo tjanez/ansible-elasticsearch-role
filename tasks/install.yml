@@ -3,24 +3,6 @@
   package: name={{ elasticsearch_java_package }} state=present
 
 - block:
-  - name: Add repository for Elasticsearch 2.x packages
-    yum_repository:
-      name: elasticsearch-2.x
-      description: Upstream Elasticsearch repository for 2.x packages
-      baseurl: https://packages.elastic.co/elasticsearch/2.x/centos
-      skip_if_unavailable: no
-      gpgcheck: yes
-      gpgkey: https://packages.elastic.co/GPG-KEY-elasticsearch
-      enabled: yes
-
-  - name: Remove repository for Elasticsearch 5.x packages
-    yum_repository:
-      name: elasticsearch-5.x
-      state: absent
-
-  when: elasticsearch_version == "2.4"
-
-- block:
   - name: Add repository for Elasticsearch 5.x packages
     yum_repository:
       name: elasticsearch-5.x
@@ -36,7 +18,7 @@
       name: elasticsearch-2.x
       state: absent
 
-  when: elasticsearch_version == "5.0"
+  when: elasticsearch_version == "5"
 
 - name: Check version of installed Elasticsearch
   command: rpm -q --queryformat "%{VERSION}" elasticsearch
