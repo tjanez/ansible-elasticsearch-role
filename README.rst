@@ -34,7 +34,7 @@ Main features:
 Requirements
 ------------
 
-This role requires Ansible 2.2 or higher.
+This role requires Ansible 2.4 or higher.
 
 
 Role Variables

@@ -10,11 +10,11 @@
     that:
       - elasticsearch_version in ["5"]
 
-- include: install.yml
+- import_tasks: install.yml
 
-- include: configure.yml
+- import_tasks: configure.yml
 
 # run pending handlers before validating Elasticsearch installation
 - meta: flush_handlers
 
-- include: validate.yml
+- import_tasks: validate.yml

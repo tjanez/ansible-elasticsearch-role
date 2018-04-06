@@ -21,7 +21,7 @@
 - set_fact:
     elasticsearch_tuned_service_enabled: "{{ elasticsearch_tuned_service_res.rc == 0 }}"
 
-- include: configure-tuned.yml
+- include_tasks: configure-tuned.yml
   when: elasticsearch_tuned_service_enabled
 
 # NOTE: Elasticsearch recommends disabling swapping altogether for
