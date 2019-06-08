@@ -8,7 +8,7 @@
 - name: Sanity check of role's configuration
   assert:
     that:
-      - elasticsearch_version in ["5"]
+      - elasticsearch_version in ["6"]
 
 - import_tasks: install.yml
 

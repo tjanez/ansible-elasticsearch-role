@@ -1,5 +1,5 @@
 # {{ ansible_managed }}
-# Configuration file taken from Elasticsearch 5.0.0
+# Configuration file taken from Elasticsearch 6.8.0
 
 ## JVM configuration
 
@@ -40,6 +40,15 @@
 -XX:CMSInitiatingOccupancyFraction=75
 -XX:+UseCMSInitiatingOccupancyOnly
 
+## DNS cache policy
+# cache ttl in seconds for positive DNS lookups noting that this overrides the
+# JDK security property networkaddress.cache.ttl; set to -1 to cache forever
+-Des.networkaddress.cache.ttl=60
+# cache ttl in seconds for negative DNS lookups noting that this overrides the
+# JDK security property networkaddress.cache.negative ttl; set to -1 to cache
+# forever
+-Des.networkaddress.cache.negative.ttl=10
+
 ## optimizations
 
 # disable calls to System#gc
@@ -50,9 +59,6 @@
 
 ## basic
 
-# force the server VM
--server
-
 # set to headless, just in case
 -Djava.awt.headless=true
 
@@ -62,6 +68,10 @@
 # use our provided JNA always versus the system one
 -Djna.nosys=true
 
+# turn off a JDK optimization that throws away stack traces for common
+# exceptions because stack traces are important for debugging
+-XX:-OmitStackTraceInFastThrow
+
 # flags to keep Netty from being unsafe
 -Dio.netty.noUnsafe=true
 -Dio.netty.noKeySetOptimization=true
@@ -69,7 +79,8 @@
 # log4j 2
 -Dlog4j.shutdownHookEnabled=false
 -Dlog4j2.disable.jmx=true
--Dlog4j.skipJansi=true
+
+-Djava.io.tmpdir=${ES_TMPDIR}
 
 ## heap dumps
 
@@ -77,27 +88,9 @@
 # heap dumps are created in the working directory of the JVM
 -XX:+HeapDumpOnOutOfMemoryError
 
-# specify an alternative path for heap dumps
-# ensure the directory exists and has sufficient space
-#-XX:HeapDumpPath=${heap.dump.path}
+# specify an alternative path for heap dumps; ensure the directory exists and
+# has sufficient space
+-XX:HeapDumpPath=/var/lib/elasticsearch
 
-## GC logging
-
-#-XX:+PrintGCDetails
-#-XX:+PrintGCTimeStamps
-#-XX:+PrintGCDateStamps
-#-XX:+PrintClassHistogram
-#-XX:+PrintTenuringDistribution
-#-XX:+PrintGCApplicationStoppedTime
-
-# log GC status to a file with time stamps
-# ensure the directory exists
-#-Xloggc:${loggc}
-
-# Elasticsearch 5.0.0 will throw an exception on unquoted field names in JSON.
-# If documents were already indexed with unquoted fields in a previous version
-# of Elasticsearch, some operations may throw errors.
-#
-# WARNING: This option will be removed in Elasticsearch 6.0.0 and is provided
-# only for migration purposes.
-#-Delasticsearch.json.allow_unquoted_field_names=true
+# specify an alternative path for JVM fatal error logs
+-XX:ErrorFile=/var/log/elasticsearch/hs_err_pid%p.log

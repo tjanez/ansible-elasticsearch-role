@@ -1,5 +1,5 @@
 ---
-elasticsearch_version: "5"
+elasticsearch_version: "6"
 
 elasticsearch_sysctl_file: /etc/sysctl.d/00-elasticsearch.conf
 

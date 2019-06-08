@@ -78,7 +78,7 @@
       path: /etc/elasticsearch/logging.yml
       state: absent
 
-  when: elasticsearch_version == "5"
+  when: elasticsearch_version == "6"
 
 - name: Enable Elasticsearch service
   systemd:

@@ -1,7 +1,7 @@
 galaxy_info:
   author: Tadej Janež
   description: >
-    Role to install and configure Elasticsearch 2.4 or 5.0 on RHEL/CentOS 7.
+    Role to install and configure Elasticsearch 6.x on RHEL/CentOS 7.
 
   license: GPLv3
 

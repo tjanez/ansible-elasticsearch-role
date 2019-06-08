@@ -14,7 +14,4 @@
 # https://github.com/moby/moby/issues/14491#issuecomment-119873335
 ExecStart=
 ExecStart=/usr/share/elasticsearch/bin/elasticsearch \
-    -p ${PID_DIR}/elasticsearch.pid \
-    -Edefault.path.logs=${LOG_DIR} \
-    -Edefault.path.data=${DATA_DIR} \
-    -Edefault.path.conf=${CONF_DIR}
+    -p ${PID_DIR}/elasticsearch.pid
