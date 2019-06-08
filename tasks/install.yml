@@ -2,23 +2,20 @@
 - name: Install JVM
   package: name=java-1.8.0-openjdk-headless state=present
 
-- block:
-  - name: Add repository for Elasticsearch 6.x packages
-    yum_repository:
-      name: elasticsearch-6.x
-      description: Upstream Elasticsearch repository for 6.x packages
-      baseurl: https://artifacts.elastic.co/packages/6.x/yum
-      skip_if_unavailable: no
-      gpgcheck: yes
-      gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
-      enabled: yes
+- name: Add repository for Elasticsearch 6.x packages
+  yum_repository:
+    name: elasticsearch-6.x
+    description: Upstream Elasticsearch repository for 6.x packages
+    baseurl: https://artifacts.elastic.co/packages/6.x/yum
+    skip_if_unavailable: no
+    gpgcheck: yes
+    gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    enabled: yes
 
-  - name: Remove repository for Elasticsearch 5.x packages
-    yum_repository:
-      name: elasticsearch-5.x
-      state: absent
-
-  when: elasticsearch_version == "6"
+- name: Remove repository for Elasticsearch 5.x packages
+  yum_repository:
+    name: elasticsearch-5.x
+    state: absent
 
 - name: Check version of installed Elasticsearch
   command: rpm -q --queryformat "%{VERSION}" elasticsearch
