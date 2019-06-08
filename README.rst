@@ -164,8 +164,7 @@ Variables in distribution-specific files under ``vars/``:
 | ``elasticsearch_java_package``             | string  | Name of the package that provides a JVM.  | ``java-1.8.0-openjdk-headless`` |
 |                                            |         |                                           |                                 |
 |                                            |         | *NOTE*: Elasticsearch 5.0 requires Java   |                                 |
-|                                            |         | 1.8, Elasticsearch 2.4 requires Java 1.7  |                                 |
-|                                            |         | or 1.8. For more information, see:        |                                 |
+|                                            |         | 1.8. For more information, see:           |                                 |
 |                                            |         | `Product and JVM matrix`_.                |                                 |
 +--------------------------------------------+---------+-------------------------------------------+---------------------------------+
 
