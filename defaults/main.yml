@@ -1,4 +1,7 @@
 ---
+elasticsearch_data_dir: /var/lib/elasticsearch
+elasticsearch_log_dir: /var/log/elasticsearch
+
 elasticsearch_version: "6"
 
 elasticsearch_sysctl_file: /etc/sysctl.d/00-elasticsearch.conf

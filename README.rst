@@ -41,31 +41,22 @@ This role requires Ansible 2.4 or higher.
 Role Variables
 --------------
 
-Variables that can be set:
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-+--------------------------------+---------+-------------------------------------------+
-|                Name            |  Type   |                Description                |
-+================================+=========+===========================================+
-| ``elasticsearch_data_dir``     | string  | Path of Elasticsearch data directory.     |
-|                                |         |                                           |
-|                                |         | For more information, see:                |
-|                                |         | `Configuring Elasticsearch`_.             |
-+--------------------------------+---------+-------------------------------------------+
-| ``elasticsearch_log_dir``      | string  | Path of Elasticsearch log directory.      |
-|                                |         |                                           |
-|                                |         | For more information, see:                |
-|                                |         | `Configuring Elasticsearch`_.             |
-+--------------------------------+---------+-------------------------------------------+
-
-.. _Configuring Elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/6.0/rpm.html#rpm-configuring
-
 Variables in ``defaults/main.yml``:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +--------------------------------------------+---------+-------------------------------------------+-----------------------------------------+
 |                Name                        |  Type   |                Description                |           Default                       |
 +============================================+=========+===========================================+=========================================+
+| ``elasticsearch_data_dir``                 | string  | Path of Elasticsearch data directory.     | ``/var/lib/elasticsearch``              |
+|                                            |         |                                           |                                         |
+|                                            |         | For more information, see:                |                                         |
+|                                            |         | `Configuring Elasticsearch`_.             |                                         |
++--------------------------------------------+---------+-------------------------------------------+-----------------------------------------+
+| ``elasticsearch_log_dir``                  | string  | Path of Elasticsearch log directory.      | ``/var/log/elasticsearch``              |
+|                                            |         |                                           |                                         |
+|                                            |         | For more information, see:                |                                         |
+|                                            |         | `Configuring Elasticsearch`_.             |                                         |
++--------------------------------------------+---------+-------------------------------------------+-----------------------------------------+
 | ``elasticsearch_version``                  | string  | Major version to install.                 | ``"6"``                                 |
 |                                            |         | The actual version that is installed is   |                                         |
 |                                            |         | the latest minor (and patch) version of   |                                         |
@@ -146,6 +137,7 @@ Variables in ``defaults/main.yml``:
 |                                            |         | stored via `systemd-journald.service`_.   |                                         |
 +--------------------------------------------+---------+-------------------------------------------+-----------------------------------------+
 
+.. _Configuring Elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/6.0/rpm.html#rpm-configuring
 .. _systemd-sysctl.service: https://www.freedesktop.org/software/systemd/man/systemd-sysctl.service.html
 .. _sysctl.d's man page: http://man7.org/linux/man-pages/man5/sysctl.d.5.html
 .. _setting heap size: https://www.elastic.co/guide/en/elasticsearch/reference/6.0/heap-size.html

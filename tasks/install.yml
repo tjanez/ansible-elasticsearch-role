@@ -37,22 +37,19 @@
   notify:
     - Restart Elasticsearch
 
-- block:
-  - name: Get Elasticsearch's system user
-    command: systemctl --property=User show elasticsearch.service
-    register: elasticsearch_user_res
-    changed_when: false
+- name: Get Elasticsearch's system user
+  command: systemctl --property=User show elasticsearch.service
+  register: elasticsearch_user_res
+  changed_when: false
 
-  - name: Get Elasticsearch's system group
-    command: systemctl --property=Group show elasticsearch.service
-    register: elasticsearch_group_res
-    changed_when: false
+- name: Get Elasticsearch's system group
+  command: systemctl --property=Group show elasticsearch.service
+  register: elasticsearch_group_res
+  changed_when: false
 
-  - set_fact:
-      elasticsearch_user: "{{ elasticsearch_user_res.stdout | regex_replace('^User=', '') }}"
-      elasticsearch_group: "{{ elasticsearch_group_res.stdout | regex_replace('^Group=', '') }}"
-
-  when: elasticsearch_data_dir is defined or elasticsearch_log_dir is defined
+- set_fact:
+    elasticsearch_user: "{{ elasticsearch_user_res.stdout | regex_replace('^User=', '') }}"
+    elasticsearch_group: "{{ elasticsearch_group_res.stdout | regex_replace('^Group=', '') }}"
 
 - name: Prepare Elasticsearch's data directory
   file:
@@ -60,7 +57,6 @@
     state: directory
     owner: "{{ elasticsearch_user }}"
     group: "{{ elasticsearch_group }}"
-  when: elasticsearch_data_dir is defined
 
 - name: Prepare Elasticsearch's log directory
   file:
@@ -68,4 +64,3 @@
     state: directory
     owner: "{{ elasticsearch_user }}"
     group: "{{ elasticsearch_group }}"
-  when: elasticsearch_log_dir is defined
