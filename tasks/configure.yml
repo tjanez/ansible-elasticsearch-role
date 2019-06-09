@@ -58,27 +58,24 @@
   notify:
     - Restart Elasticsearch
 
-- block:
-  - name: Configure Elasticsearch JVM options
-    template:
-      src: etc/elasticsearch/jvm.options.j2
-      dest: /etc/elasticsearch/jvm.options
-    notify:
-      - Restart Elasticsearch
+- name: Configure Elasticsearch JVM options
+  template:
+    src: etc/elasticsearch/jvm.options.j2
+    dest: /etc/elasticsearch/jvm.options
+  notify:
+    - Restart Elasticsearch
 
-  - name: Configure Elasticsearch logging
-    template:
-      src: etc/elasticsearch/log4j2.properties.j2
-      dest: /etc/elasticsearch/log4j2.properties
-    notify:
-      - Restart Elasticsearch
+- name: Configure Elasticsearch logging
+  template:
+    src: etc/elasticsearch/log4j2.properties.j2
+    dest: /etc/elasticsearch/log4j2.properties
+  notify:
+    - Restart Elasticsearch
 
-  - name: Remove other Elasticsearch logging configuration
-    file:
-      path: /etc/elasticsearch/logging.yml
-      state: absent
-
-  when: elasticsearch_version == "5"
+- name: Remove other Elasticsearch logging configuration
+  file:
+    path: /etc/elasticsearch/logging.yml
+    state: absent
 
 - name: Enable Elasticsearch service
   systemd:

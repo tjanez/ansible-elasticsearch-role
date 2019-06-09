@@ -1,24 +1,21 @@
 ---
 - name: Install JVM
-  package: name={{ elasticsearch_java_package }} state=present
+  package: name=java-1.8.0-openjdk-headless state=present
 
-- block:
-  - name: Add repository for Elasticsearch 5.x packages
-    yum_repository:
-      name: elasticsearch-5.x
-      description: Upstream Elasticsearch repository for 5.x packages
-      baseurl: https://artifacts.elastic.co/packages/5.x/yum
-      skip_if_unavailable: no
-      gpgcheck: yes
-      gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
-      enabled: yes
+- name: Add repository for Elasticsearch 6.x packages
+  yum_repository:
+    name: elasticsearch-6.x
+    description: Upstream Elasticsearch repository for 6.x packages
+    baseurl: https://artifacts.elastic.co/packages/6.x/yum
+    skip_if_unavailable: no
+    gpgcheck: yes
+    gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    enabled: yes
 
-  - name: Remove repository for Elasticsearch 2.x packages
-    yum_repository:
-      name: elasticsearch-2.x
-      state: absent
-
-  when: elasticsearch_version == "5"
+- name: Remove repository for Elasticsearch 5.x packages
+  yum_repository:
+    name: elasticsearch-5.x
+    state: absent
 
 - name: Check version of installed Elasticsearch
   command: rpm -q --queryformat "%{VERSION}" elasticsearch
@@ -37,22 +34,19 @@
   notify:
     - Restart Elasticsearch
 
-- block:
-  - name: Get Elasticsearch's system user
-    command: systemctl --property=User show elasticsearch.service
-    register: elasticsearch_user_res
-    changed_when: false
+- name: Get Elasticsearch's system user
+  command: systemctl --property=User show elasticsearch.service
+  register: elasticsearch_user_res
+  changed_when: false
 
-  - name: Get Elasticsearch's system group
-    command: systemctl --property=Group show elasticsearch.service
-    register: elasticsearch_group_res
-    changed_when: false
+- name: Get Elasticsearch's system group
+  command: systemctl --property=Group show elasticsearch.service
+  register: elasticsearch_group_res
+  changed_when: false
 
-  - set_fact:
-      elasticsearch_user: "{{ elasticsearch_user_res.stdout | regex_replace('^User=', '') }}"
-      elasticsearch_group: "{{ elasticsearch_group_res.stdout | regex_replace('^Group=', '') }}"
-
-  when: elasticsearch_data_dir is defined or elasticsearch_log_dir is defined
+- set_fact:
+    elasticsearch_user: "{{ elasticsearch_user_res.stdout | regex_replace('^User=', '') }}"
+    elasticsearch_group: "{{ elasticsearch_group_res.stdout | regex_replace('^Group=', '') }}"
 
 - name: Prepare Elasticsearch's data directory
   file:
@@ -60,7 +54,11 @@
     state: directory
     owner: "{{ elasticsearch_user }}"
     group: "{{ elasticsearch_group }}"
-  when: elasticsearch_data_dir is defined
+    # NOTE: While upgrading from ES5 to ES6, an 'elasticsearch' user
+    #       with different UID/GID is created, but permissions on data
+    #       directory are not handled correctly, so they have to be set
+    #       manually.
+    recurse: true
 
 - name: Prepare Elasticsearch's log directory
   file:
@@ -68,4 +66,3 @@
     state: directory
     owner: "{{ elasticsearch_user }}"
     group: "{{ elasticsearch_group }}"
-  when: elasticsearch_log_dir is defined

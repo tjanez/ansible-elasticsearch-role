@@ -29,7 +29,7 @@
     msg: >
       System's setting for maximum number of memory map areas for a process is
       not set high enough (i.e. at least 262144). For more info, see:
-      https://www.elastic.co/guide/en/elasticsearch/reference/5.0/vm-max-map-count.html
+      https://www.elastic.co/guide/en/elasticsearch/reference/6.8/vm-max-map-count.html
   when: elasticsearch_mmap_res.stdout | int < 262144
 
 - name: Get swappiness value
@@ -55,7 +55,7 @@
     msg: >
       Elasticsearch service can't spawn enough processes/threads (i.e. at least
       2048). For info, see:
-      https://www.elastic.co/guide/en/elasticsearch/reference/5.0/max-number-of-threads.html
+      https://www.elastic.co/guide/en/elasticsearch/reference/6.8/max-number-of-threads.html
   when: elasticsearch_nproc_res.stdout | regex_replace('^LimitNPROC=', '') | int < 2048
 
 - name: Get node's JVM information

@@ -7,28 +7,29 @@ Elasticsearch
     :target: https://galaxy.ansible.com/tjanez/elasticsearch/
     :alt: Ansible Role
 
-Ansible role to install and configure Elasticsearch 5.x on RHEL/CentOS 7.
+Ansible role to install and configure Elasticsearch 6.x on RHEL/CentOS 7.
 
-**NOTE: This version of the role only supports Elasticsearch 5.x. To use the
-role with Elasticsearch 2.4, use version 1.0.0.**
+**NOTE: This version of the role only supports Elasticsearch 6.x. To use the
+role with Elasticsearch 2.4 or 5.6, use version 1.0.0 or 2.0.0,
+respectively.**
 
 Main features:
 
 - Installs Elasticsearch from upstream's RPM repositories.
-- Upgrades Elastcisearch from version 2.x (if necessary).
+- Upgrades Elastcisearch from version 5.x (if necessary).
 - Configures Elasticsearch according to the `official Elasticsearch Reference
-  for version 5.0`_
+  for version 6.0`_
 - Configures system's performance settings with `Tuned`_ if it is enabled
   (default for RHEL/CentOS 7).
 - Validates `important Elasticsearch system and JVM configuration`_.
 
-.. _official Elasticsearch Reference for version 5.0:
-  https://www.elastic.co/guide/en/elasticsearch/reference/5.0/index.html
+.. _official Elasticsearch Reference for version 6.0:
+  https://www.elastic.co/guide/en/elasticsearch/reference/6.0/index.html
 .. _Tuned:
   https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/
   Performance_Tuning_Guide/chap-Red_Hat_Enterprise_Linux-Performance_Tuning_Guide-Tuned.html
 .. _important Elasticsearch system and JVM configuration:
-  https://www.elastic.co/guide/en/elasticsearch/reference/5.0/important-settings.html
+  https://www.elastic.co/guide/en/elasticsearch/reference/6.0/important-settings.html
 
 
 Requirements
@@ -40,39 +41,30 @@ This role requires Ansible 2.4 or higher.
 Role Variables
 --------------
 
-Variables that can be set:
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-+--------------------------------+---------+-------------------------------------------+
-|                Name            |  Type   |                Description                |
-+================================+=========+===========================================+
-| ``elasticsearch_data_dir``     | string  | Path of Elasticsearch data directory.     |
-|                                |         |                                           |
-|                                |         | For more information, see:                |
-|                                |         | `Configuring Elasticsearch`_.             |
-+--------------------------------+---------+-------------------------------------------+
-| ``elasticsearch_log_dir``      | string  | Path of Elasticsearch log directory.      |
-|                                |         |                                           |
-|                                |         | For more information, see:                |
-|                                |         | `Configuring Elasticsearch`_.             |
-+--------------------------------+---------+-------------------------------------------+
-
-.. _Configuring Elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/5.0/rpm.html#rpm-configuring
-
 Variables in ``defaults/main.yml``:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +--------------------------------------------+---------+-------------------------------------------+-----------------------------------------+
 |                Name                        |  Type   |                Description                |           Default                       |
 +============================================+=========+===========================================+=========================================+
-| ``elasticsearch_version``                  | string  | Major version to install.                 | ``"5"``                                 |
+| ``elasticsearch_data_dir``                 | string  | Path of Elasticsearch data directory.     | ``/var/lib/elasticsearch``              |
+|                                            |         |                                           |                                         |
+|                                            |         | For more information, see:                |                                         |
+|                                            |         | `Configuring Elasticsearch`_.             |                                         |
++--------------------------------------------+---------+-------------------------------------------+-----------------------------------------+
+| ``elasticsearch_log_dir``                  | string  | Path of Elasticsearch log directory.      | ``/var/log/elasticsearch``              |
+|                                            |         |                                           |                                         |
+|                                            |         | For more information, see:                |                                         |
+|                                            |         | `Configuring Elasticsearch`_.             |                                         |
++--------------------------------------------+---------+-------------------------------------------+-----------------------------------------+
+| ``elasticsearch_version``                  | string  | Major version to install.                 | ``"6"``                                 |
 |                                            |         | The actual version that is installed is   |                                         |
 |                                            |         | the latest minor (and patch) version of   |                                         |
 |                                            |         | the chosen major version.                 |                                         |
 |                                            |         |                                           |                                         |
 |                                            |         | It can be one of the following:           |                                         |
 |                                            |         |                                           |                                         |
-|                                            |         | * ``"5"``                                 |                                         |
+|                                            |         | * ``"6"``                                 |                                         |
 +--------------------------------------------+---------+-------------------------------------------+-----------------------------------------+
 | ``elasticsearch_sysctl_file``              | string  | Path of Elasticsearch's sysctl            | ``/etc/sysctl.d/00-elasticsearch.conf`` |
 |                                            |         | configuration file.                       |                                         |
@@ -145,13 +137,14 @@ Variables in ``defaults/main.yml``:
 |                                            |         | stored via `systemd-journald.service`_.   |                                         |
 +--------------------------------------------+---------+-------------------------------------------+-----------------------------------------+
 
+.. _Configuring Elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/6.0/rpm.html#rpm-configuring
 .. _systemd-sysctl.service: https://www.freedesktop.org/software/systemd/man/systemd-sysctl.service.html
 .. _sysctl.d's man page: http://man7.org/linux/man-pages/man5/sysctl.d.5.html
-.. _setting heap size: https://www.elastic.co/guide/en/elasticsearch/reference/5.0/heap-size.html
-.. _cluster.name documentation: https://www.elastic.co/guide/en/elasticsearch/reference/5.0/important-settings.html#cluster.name
-.. _node.name documentation: https://www.elastic.co/guide/en/elasticsearch/reference/5.0/important-settings.html#node.name
-.. _network settings documentation: https://www.elastic.co/guide/en/elasticsearch/reference/5.0/modules-network.html#common-network-settings
-.. _node.max_local_storage_nodes documentation: https://www.elastic.co/guide/en/elasticsearch/reference/5.0/important-settings.html#node.max_local_storage_nodes
+.. _setting heap size: https://www.elastic.co/guide/en/elasticsearch/reference/6.0/heap-size.html
+.. _cluster.name documentation: https://www.elastic.co/guide/en/elasticsearch/reference/6.0/important-settings.html#cluster.name
+.. _node.name documentation: https://www.elastic.co/guide/en/elasticsearch/reference/6.0/important-settings.html#node.name
+.. _network settings documentation: https://www.elastic.co/guide/en/elasticsearch/reference/6.0/modules-network.html#common-network-settings
+.. _node.max_local_storage_nodes documentation: https://www.elastic.co/guide/en/elasticsearch/reference/6.0/important-settings.html#node.max_local_storage_nodes
 .. _systemd-journald.service: https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html
 
 
@@ -163,9 +156,8 @@ Variables in distribution-specific files under ``vars/``:
 +============================================+=========+===========================================+=================================+
 | ``elasticsearch_java_package``             | string  | Name of the package that provides a JVM.  | ``java-1.8.0-openjdk-headless`` |
 |                                            |         |                                           |                                 |
-|                                            |         | *NOTE*: Elasticsearch 5.0 requires Java   |                                 |
-|                                            |         | 1.8, Elasticsearch 2.4 requires Java 1.7  |                                 |
-|                                            |         | or 1.8. For more information, see:        |                                 |
+|                                            |         | *NOTE*: Elasticsearch 6.0 requires Java   |                                 |
+|                                            |         | 1.8. For more information, see:           |                                 |
 |                                            |         | `Product and JVM matrix`_.                |                                 |
 +--------------------------------------------+---------+-------------------------------------------+---------------------------------+
 
