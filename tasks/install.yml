@@ -54,6 +54,11 @@
     state: directory
     owner: "{{ elasticsearch_user }}"
     group: "{{ elasticsearch_group }}"
+    # NOTE: While upgrading from ES5 to ES6, an 'elasticsearch' user
+    #       with different UID/GID is created, but permissions on data
+    #       directory are not handled correctly, so they have to be set
+    #       manually.
+    recurse: true
 
 - name: Prepare Elasticsearch's log directory
   file:
